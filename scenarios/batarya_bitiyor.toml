@@ -1,0 +1,4 @@
+# Batarya dakikada 1 V düşüyor. Ana algoritmanın logladığı voltajın düştüğünü görürsün.
+[battery]
+voltage_v = 15.0
+drain_v_per_min = 1.0

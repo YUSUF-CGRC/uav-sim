@@ -1,0 +1,4 @@
+# Batarya eşiğin (14.0 V) altında. Beklenen: battery FAIL.
+[battery]
+voltage_v = 13.2
+remaining_pct = 15

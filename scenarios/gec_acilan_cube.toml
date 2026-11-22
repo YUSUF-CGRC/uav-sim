@@ -1,0 +1,4 @@
+# Cube, simülatör başladıktan 4 sn sonra konuşmaya başlar (geç açılan otopilot).
+# Retry mantığın ilk denemede FAIL, sonra OK vermeli.
+[link]
+start_delay_s = 4.0

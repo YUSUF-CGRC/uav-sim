@@ -1,0 +1,7 @@
+# Cube açık ama HEARTBEAT göndermiyor (ya da kablo ters takılmış gibi).
+# Beklenen: mavlink FAIL, ona bağlı cihazlar (gps, battery, ...) SKIP.
+[heartbeat]
+enabled = false
+
+[gcs]
+fake_heartbeat = false

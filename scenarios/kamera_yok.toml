@@ -1,0 +1,3 @@
+# Kamera kablosu takılı değil. Beklenen: camera FAIL.
+[camera]
+available = false

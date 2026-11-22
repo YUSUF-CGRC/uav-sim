@@ -1,0 +1,4 @@
+# Kamera start() içinde sonsuza kadar takılıyor.
+# Beklenen: program KİLİTLENMEZ, zaman aşımından sonra camera FAIL.
+[camera]
+hang_on_start = true

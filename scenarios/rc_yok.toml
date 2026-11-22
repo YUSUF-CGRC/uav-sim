@@ -1,0 +1,3 @@
+# RC alıcı bağlı değil. Beklenen: rc_link FAIL.
+[sensors]
+present = ["gyro", "accel", "mag", "baro", "gps"]

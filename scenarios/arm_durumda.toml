@@ -1,0 +1,3 @@
+# Uçak ARM durumda. Beklenen: --servo-test REDDEDİLMELİ.
+[heartbeat]
+armed = true

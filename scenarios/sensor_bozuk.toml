@@ -1,0 +1,4 @@
+# Pusula (mag) takılı (present) ama sağlıklı (healthy) değil.
+# Beklenen: sensors FAIL, açıklamada "mag" yazmalı.
+[sensors]
+unhealthy = ["mag"]

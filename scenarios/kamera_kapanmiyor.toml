@@ -1,0 +1,4 @@
+# Kamera close() sırasında hata veriyor.
+# Beklenen: diğer cihazlar yine kapanır, çıkış kodu 3.
+[camera]
+fail_on_close = true

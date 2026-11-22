@@ -1,0 +1,5 @@
+# Pi ısınmış ve düşük voltaj yaşamış (0x50005). pi_system kritik değil.
+# Beklenen: pi_system WARN, ama sonuç yine HAZIR.
+[pi]
+cpu_temp_c = 78.0
+throttled = "0x50005"

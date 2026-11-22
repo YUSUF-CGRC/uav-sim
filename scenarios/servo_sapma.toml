@@ -1,0 +1,4 @@
+# Görev servosu komut verilen değerden 30 us sapıyor (tolerans 15 us).
+# Beklenen: servo testinde adımlar BAŞARISIZ.
+[servo]
+output_offset_us = 30

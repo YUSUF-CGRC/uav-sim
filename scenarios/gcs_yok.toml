@@ -1,0 +1,5 @@
+# Mission Planner'ın heartbeat'i Pi'ye ulaşmıyor
+# (MP kapalı veya Cube yönlendirme yapmıyor). Beklenen: gcs_link FAIL.
+[gcs]
+fake_heartbeat = false
+forward_to_pi = false

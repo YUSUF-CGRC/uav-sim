@@ -1,0 +1,3 @@
+# Her şey sağlıklı. Preflight kodun bu senaryoda HAZIR demeli.
+# Bu dosyada değer yazmazsan uav_sim/scenario.py içindeki DEFAULTS kullanılır.
+# Değiştirmek istediğin her şeyi buraya ekleyebilirsin, örnekler diğer dosyalarda.

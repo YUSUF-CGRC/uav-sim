@@ -1,0 +1,4 @@
+# GPS açılıştan 8 sn sonra kilitlenir. Yeniden deneme (retry) mantığını dene:
+# ilk denemeler FAIL, sonraki deneme OK olabilir.
+[gps]
+fix_after_s = 8.0

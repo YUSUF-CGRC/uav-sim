@@ -1,0 +1,4 @@
+# GPS kilitlenmemiş (kapalı alanda gibi). Beklenen: gps FAIL.
+[gps]
+fix_type = 1
+satellites = 3

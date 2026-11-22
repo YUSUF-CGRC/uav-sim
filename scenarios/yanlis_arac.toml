@@ -1,0 +1,4 @@
+# Karşıdaki otopilot sabit kanat değil (yanlış araca bağlandın).
+# Beklenen: mavlink FAIL (type=QUADROTOR, FIXED_WING bekleniyordu).
+[heartbeat]
+vehicle_type = "QUADROTOR"

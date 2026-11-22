@@ -1,0 +1,4 @@
+# Giden paketlerin %30'u kayboluyor (kötü kablo / parazit).
+# Kodun bu durumda da sağlam çalışıyor mu?
+[link]
+packet_loss = 0.3

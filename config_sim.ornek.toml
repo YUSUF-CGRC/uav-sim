@@ -1,0 +1,13 @@
+# ÖRNEK: Kendi preflight projende simülasyon için ayrı bir yapılandırma dosyası.
+# Gerçek config.toml dosyanı kopyala, sadece aşağıdaki farklı değerleri değiştir.
+# (Bu dosyanın adı ve anahtarları sadece öneri; kendi tasarımına göre değiştir.)
+
+[connection]
+port = "udpin:0.0.0.0:14560"   # gerçek Pi'de "/dev/ttyAMA0"
+baud = 921600                  # UDP'de kullanılmaz ama zararı yok
+
+[pi_system]
+# Gerçek Pi'de: "/sys/class/thermal/thermal_zone0/temp" ve ["vcgencmd", "get_throttled"]
+# Aşağıdaki yolları kendi bilgisayarındaki uav-sim klasörüne göre düzelt.
+thermal_path = "C:/Users/KULLANICI/uav-sim/sim_pi/thermal_zone0/temp"
+throttled_cmd = ["python", "C:/Users/KULLANICI/uav-sim/sim_pi/vcgencmd.py", "get_throttled"]

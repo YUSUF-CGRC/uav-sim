@@ -133,7 +133,7 @@ def resolve_scenario(name: str | None) -> Path | None:
     if builtin.exists():
         return builtin
     raise FileNotFoundError(
-        f"Senaryo bulunamadı: {name}. Hazır senaryoları görmek için: uav-sim list")
+        f"Senaryo bulunamadı: {name}. Hazır senaryoları görmek için: python -m uav_sim list")
 
 
 def list_scenarios() -> list[tuple[str, str]]:

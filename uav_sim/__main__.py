@@ -78,11 +78,11 @@ def cmd_cube(scenario_name: str | None, verbose: bool) -> int:
 
 def cmd_list() -> int:
     """Hazır senaryoları listeler."""
-    print("Hazır senaryolar (kullanım: uav-sim <ad>):\n")
+    print("Hazır senaryolar (kullanım: python -m uav_sim <ad>):\n")
     for name, desc in list_scenarios():
         print(f"  {name:22s} {desc}")
     print("\nKendi senaryon için bir .toml dosyası yazıp yolunu verebilirsin: "
-          "uav-sim benim.toml")
+          "python -m uav_sim benim.toml")
     return 0
 
 
@@ -100,7 +100,7 @@ def cmd_run(scenario_name: str, command: list[str], quiet: bool) -> int:
     """Sahte Cube'u arka planda açar, komutu çalıştırır, sonra Cube'u kapatır."""
     if not command:
         print("Çalıştırılacak komut yok. Örnek:\n"
-              "  uav-sim run gps_yok -- python -m preflight --check-only")
+              "  python -m uav_sim run gps_yok -- python -m preflight --check-only")
         return 2
     path = resolve_scenario(scenario_name)
     env = dict(os.environ)
@@ -153,7 +153,7 @@ def cmd_env(scenario_name: str) -> int:
     print("\nPowerShell için:\n")
     for key, value in env.items():
         print(f'  $env:{key} = "{value}"')
-    print("\nSahte Cube'u başka bir pencerede başlat:  uav-sim", path.stem)
+    print("\nSahte Cube'u başka bir pencerede başlat:  python -m uav_sim", path.stem)
     print(f"Kodunda bağlantı adresi: {PI_PORT_HINT}")
     return 0
 
@@ -185,7 +185,7 @@ def cmd_paths() -> int:
     print("Simülasyon config dosyana yazabileceğin değerler:\n")
     print(f'  port          = "{PI_PORT_HINT}"')
     print(f'  thermal_path  = "{(folder / "thermal_zone0" / "temp").as_posix()}"')
-    print('  throttled_cmd = ["uav-sim", "vcgencmd", "get_throttled"]')
+    print('  throttled_cmd = ["python", "-m", "uav_sim", "vcgencmd", "get_throttled"]')
     print("\n(Gerçek Pi'de: /dev/ttyAMA0, /sys/class/thermal/thermal_zone0/temp,"
           ' ["vcgencmd", "get_throttled"])')
     return 0

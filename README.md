@@ -13,7 +13,7 @@ karşısındaki "uçak" rolünü oynar. Preflight kodunu ayrı bir klasörde sen
 | Cube TELEM1 ↔ SiK radyo ↔ Mission Planner | UDP port **14550**. Mission Planner'da UDP + 14550 |
 | Pi Camera + `picamera2` | Sahte `picamera2` (kodun değişmez) |
 | `/sys/class/thermal/thermal_zone0/temp` | `~/.uav-sim/pi/thermal_zone0/temp` (sahte Cube yazar) |
-| `vcgencmd get_throttled` | `uav-sim vcgencmd get_throttled` |
+| `vcgencmd get_throttled` | `python -m uav_sim vcgencmd get_throttled` |
 | Disk (`shutil.disk_usage`) | Gerçek disk, olduğu gibi çalışır |
 
 Sahte Cube şu mesajları gönderir: `HEARTBEAT`, `SYS_STATUS`, `GPS_RAW_INT`, `RC_CHANNELS`,
@@ -43,21 +43,23 @@ Bilgisayarında git kuruluysa şu da olur: `python -m pip install git+https://gi
 
 **Güncellemek** için aynı komutu sonuna `--upgrade` ekleyerek çalıştır.
 
-Kurulum sonunda "Scripts ... is not on PATH" uyarısı çıkarsa `uav-sim` komutu bulunamayabilir.
-O zaman her yerde `uav-sim` yerine `python -m uav_sim` yaz, aynı şekilde çalışır.
+**Komutları `python -m uav_sim ...` şeklinde çalıştır.** Bu her bilgisayarda çalışır.
+Kısa hali `uav-sim ...` da var, ama Windows'ta Python'un `Scripts` klasörü PATH'te değilse
+"uav-sim is not recognized" hatası verir. Kurulumda "...Scripts is not on PATH" uyarısı
+gördüysen ya kısa hali kullanma ya da o klasörü PATH'e ekle.
 
 ## Kullanım
 
 ```
-uav-sim list                 # hazır senaryoları listeler
-uav-sim gps_yok              # sahte Cube'u gps_yok senaryosuyla başlatır (Ctrl+C ile durur)
-uav-sim paths                # config dosyana yazacağın sahte Pi yolları
+python -m uav_sim list                 # hazır senaryoları listeler
+python -m uav_sim gps_yok              # sahte Cube'u gps_yok senaryosuyla başlatır (Ctrl+C ile durur)
+python -m uav_sim paths                # config dosyana yazacağın sahte Pi yolları
 ```
 
 **En kolay yol: tek komut.** Preflight projenin klasöründe şunu çalıştır:
 
 ```
-uav-sim run gps_yok -- python -m preflight --config config_sim.toml --check-only
+python -m uav_sim run gps_yok -- python -m preflight --config config_sim.toml --check-only
 ```
 
 Bu komut sırasıyla şunları yapar:
@@ -67,12 +69,12 @@ Bu komut sırasıyla şunları yapar:
 4. Programın yasak bir işlem gönderdiyse sonunda büyük bir uyarı verir.
 
 Cube mesajlarını görmek istemezsen senaryo adından önce `-q` ekle:
-`uav-sim run -q gps_yok -- ...`
+`python -m uav_sim run -q gps_yok -- ...`
 
 **İki pencereyle çalışmak istersen**, örneğin Cube'u uzun süre açık tutup kodunu tekrar
 tekrar çalıştırmak için:
-1. Birinci pencerede `uav-sim gps_yok` çalıştır.
-2. İkinci pencerede `uav-sim env gps_yok` yaz. Ekrana basılan `set ...` (cmd) ya da
+1. Birinci pencerede `python -m uav_sim gps_yok` çalıştır.
+2. İkinci pencerede `python -m uav_sim env gps_yok` yaz. Ekrana basılan `set ...` (cmd) ya da
    `$env:...` (PowerShell) satırlarını o pencereye yapıştır.
 3. Kodunu ikinci pencerede istediğin kadar çalıştır.
 
@@ -92,8 +94,8 @@ Ctrl+F ile açılan menüde **MAVLink Inspector** ile mesajları canlı izleyebi
 
 ## Kamera
 
-Kodunda normal şekilde `from picamera2 import Picamera2` yaz. `uav-sim run` (ya da
-`uav-sim env`) `PYTHONPATH`'i ayarladığı için Python sahte kamerayı bulur. Gerçek Pi'de
+Kodunda normal şekilde `from picamera2 import Picamera2` yaz. `python -m uav_sim run` (ya da
+`python -m uav_sim env`) `PYTHONPATH`'i ayarladığı için Python sahte kamerayı bulur. Gerçek Pi'de
 bunu yapmazsın, gerçek kütüphane çalışır. Sahte kamera sadece `uav-sim` üzerinden
 çalıştırınca devreye girer, normal Python ortamını bozmaz. Sahte kamera şunları destekler:
 
@@ -112,13 +114,13 @@ Gerçeğe benzeyen birkaç davranışı da var:
 
 Sahte Cube çalışırken her saniye `<kullanıcı klasörü>/.uav-sim/pi/thermal_zone0/temp`
 (mili-derece, örneğin `52000`) ve `.../pi/throttled` dosyalarını yazar. Tam yolları
-`uav-sim paths` gösterir. `vcgencmd` yerine `uav-sim vcgencmd get_throttled` kullanılır. Kodunda bu yolları kodun içine gömme, config'den
+`python -m uav_sim paths` gösterir. `vcgencmd` yerine `python -m uav_sim vcgencmd get_throttled` kullanılır. Kodunda bu yolları kodun içine gömme, config'den
 oku (proje kuralı zaten bu). Simülasyon için ayrı bir config dosyası kullan. Örneği
 [`config_sim.ornek.toml`](config_sim.ornek.toml) dosyasında bulabilirsin.
 
 ## Senaryolar
 
-`uav-sim list` hepsini gösterir. Dosyalar [`uav_sim/scenarios/`](uav_sim/scenarios)
+`python -m uav_sim list` hepsini gösterir. Dosyalar [`uav_sim/scenarios/`](uav_sim/scenarios)
 klasöründe, her dosyanın başında ne beklendiği yazıyor.
 
 | Senaryo | Ne oluyor? | Beklenen sonuç |
@@ -146,7 +148,7 @@ klasöründe, her dosyanın başında ne beklendiği yazıyor.
 | `paket_kaybi` | Paketlerin %30'u kayboluyor | Kod sağlam kalmalı |
 
 **Kendi senaryonu yaz.** Yeni bir `.toml` dosyası oluştur ve sadece değiştirmek istediğin
-değerleri yaz. Sonra ad yerine dosya yolunu ver: `uav-sim run benim.toml -- ...` Yazmadığın her şey [`uav_sim/scenario.py`](uav_sim/scenario.py) içindeki
+değerleri yaz. Sonra ad yerine dosya yolunu ver: `python -m uav_sim run benim.toml -- ...` Yazmadığın her şey [`uav_sim/scenario.py`](uav_sim/scenario.py) içindeki
 `DEFAULTS` sözlüğünden gelir. Tüm ayarlar orada açıklamalı olarak duruyor (kanal
 parametreleri, mesaj hızları, sysid ve diğerleri).
 

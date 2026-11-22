@@ -43,6 +43,11 @@ Bilgisayarında git kuruluysa şu da olur: `python -m pip install git+https://gi
 
 **Güncellemek** için aynı komutu sonuna `--upgrade` ekleyerek çalıştır.
 
+> **Windows ipucu:** Bilgisayarında birden fazla Python varsa `python` eski sürümü açabilir ve
+> "No module named uav_sim" hatası alırsın. O zaman `python` yerine **`py`** yaz
+> (`py -m pip install ...`, `py -m uav_sim list`). `py` her zaman en yeni Python'u açar.
+> Paket her Python sürümüne bir kere kurulur; her terminalde yeniden kurman gerekmez.
+
 **Komutları `python -m uav_sim ...` şeklinde çalıştır.** Bu her bilgisayarda çalışır.
 Kısa hali `uav-sim ...` da var, ama Windows'ta Python'un `Scripts` klasörü PATH'te değilse
 "uav-sim is not recognized" hatası verir. Kurulumda "...Scripts is not on PATH" uyarısı

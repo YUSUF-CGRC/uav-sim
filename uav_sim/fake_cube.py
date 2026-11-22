@@ -30,9 +30,10 @@ os.environ.setdefault("MAVLINK20", "1")
 from pymavlink import mavutil  # noqa: E402
 from pymavlink.dialects.v20 import ardupilotmega as mavlink2  # noqa: E402
 
+from .scenario import pi_dir  # noqa: E402
+
 log = logging.getLogger("fake_cube")
 
-ROOT = Path(__file__).resolve().parent.parent   # uav-sim klasörü
 
 # SYS_STATUS içindeki sensör bitleri (MAV_SYS_STATUS_SENSOR)
 SENSOR_BITS: dict[str, int] = {
@@ -154,9 +155,8 @@ class FakeCube:
         self.rates = dict(self.default_rates)
         self.next_send = {name: 0.0 for name in self.rates}
 
-        folder = Path(scenario["pi"]["folder"])
-        # Göreli yol verilirse uav-sim klasörüne göre çözülür (nereden çalıştırırsan çalıştır)
-        self.pi_folder = folder if folder.is_absolute() else ROOT / folder
+        folder = scenario["pi"]["folder"]
+        self.pi_folder = Path(folder) if folder else pi_dir()
         self.next_pi_write = 0.0
         self.next_status = 0.0
 

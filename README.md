@@ -1,7 +1,7 @@
 # uav-sim: Preflight kodunu donanımsız deneme ortamı
 
-Bu klasör, Pi, Cube ve kamera elinde yokken yazdığın **preflight** kodunu kendi
-Windows bilgisayarında denemen için hazırlandı. Senin kodunun parçası değil:
+Pi, Cube ve kamera elinde yokken yazdığın **preflight** kodunu kendi bilgisayarında
+(Windows, Linux, Mac) denemen için hazırlandı. Senin kodunun parçası değil:
 karşısındaki "uçak" rolünü oynar. Preflight kodunu ayrı bir klasörde sen yazarsın.
 
 ## Gerçek sistem ve simülasyon
@@ -11,9 +11,9 @@ karşısındaki "uçak" rolünü oynar. Preflight kodunu ayrı bir klasörde sen
 | Cube Orange+ (ArduPlane) | `python -m uav_sim` (sahte Cube) |
 | Pi GPIO14/15 ↔ Cube TELEM2 (seri, 921600 baud) | UDP port **14560**. Kodun `udpin:0.0.0.0:14560` adresine bağlanır |
 | Cube TELEM1 ↔ SiK radyo ↔ Mission Planner | UDP port **14550**. Mission Planner'da UDP + 14550 |
-| Pi Camera + `picamera2` | `sim_libs/picamera2` (sahte kamera, kodun değişmez) |
-| `/sys/class/thermal/thermal_zone0/temp` | `sim_pi/thermal_zone0/temp` (sahte Cube yazar) |
-| `vcgencmd get_throttled` | `python sim_pi/vcgencmd.py get_throttled` |
+| Pi Camera + `picamera2` | Sahte `picamera2` (kodun değişmez) |
+| `/sys/class/thermal/thermal_zone0/temp` | `~/.uav-sim/pi/thermal_zone0/temp` (sahte Cube yazar) |
+| `vcgencmd get_throttled` | `uav-sim vcgencmd get_throttled` |
 | Disk (`shutil.disk_usage`) | Gerçek disk, olduğu gibi çalışır |
 
 Sahte Cube şu mesajları gönderir: `HEARTBEAT`, `SYS_STATUS`, `GPS_RAW_INT`, `RC_CHANNELS`,
@@ -32,33 +32,49 @@ büyük bir **YASAK İŞLEM** uyarısı basar. Kodunu teslim etmeden önce bu uy
 
 ## Kurulum (bir kere)
 
-1. Python **3.11 veya üstü** kurulu olmalı (`tomllib` 3.11 ile geldi). Komut İstemi'nde
-   kontrol et: `python --version`
-2. Bu klasörü istediğin yere çıkar, örneğin `C:\Users\Yusuf\uav-sim`
-3. Komut İstemi'nde (cmd) bu klasöre gir ve kütüphaneleri kur:
-   ```
-   cd C:\Users\Yusuf\uav-sim
-   python -m pip install -r requirements.txt
-   ```
+Python **3.11 veya üstü** gerekli (`python --version` ile kontrol et). Herhangi bir
+terminalde (cmd ya da PowerShell, hangi klasörde olduğun fark etmez):
+
+```
+python -m pip install https://github.com/YUSUF-CGRC/uav-sim/archive/refs/heads/main.zip
+```
+
+Bilgisayarında git kuruluysa şu da olur: `python -m pip install git+https://github.com/YUSUF-CGRC/uav-sim`
+
+**Güncellemek** için aynı komutu sonuna `--upgrade` ekleyerek çalıştır.
+
+Kurulum sonunda "Scripts ... is not on PATH" uyarısı çıkarsa `uav-sim` komutu bulunamayabilir.
+O zaman her yerde `uav-sim` yerine `python -m uav_sim` yaz, aynı şekilde çalışır.
 
 ## Kullanım
 
-**1. Simülatörü başlat.** Komut İstemi'nde (PowerShell değil):
 ```
-C:\Users\Yusuf\uav-sim\sim.bat gps_yok
+uav-sim list                 # hazır senaryoları listeler
+uav-sim gps_yok              # sahte Cube'u gps_yok senaryosuyla başlatır (Ctrl+C ile durur)
+uav-sim paths                # config dosyana yazacağın sahte Pi yolları
 ```
-Bu komut sahte Cube'u yeni bir pencerede açar. Ayrıca bulunduğun pencerede iki ortam
-değişkeni ayarlar:
-- `UAV_SIM_SCENARIO`: Senaryo dosyası. Sahte kamera da buradan okur.
-- `PYTHONPATH`: Python'un sahte `picamera2`'yi bulması için.
 
-Senaryo adı vermezsen `normal` kullanılır.
+**En kolay yol: tek komut.** Preflight projenin klasöründe şunu çalıştır:
 
-**2. Aynı pencerede kendi kodunu çalıştır:**
 ```
-cd C:\Users\Yusuf\preflight
-python -m preflight --port udpin:0.0.0.0:14560 --check-only
+uav-sim run gps_yok -- python -m preflight --config config_sim.toml --check-only
 ```
+
+Bu komut sırasıyla şunları yapar:
+1. Sahte Cube'u arka planda açar. Mesajları `[cube]` etiketiyle ekranda görürsün.
+2. `--` işaretinden sonraki komutunu sahte kamera ve sahte Pi ayarlarıyla çalıştırır.
+3. Komutun bitince Cube'u kapatır ve programının çıkış kodunu söyler.
+4. Programın yasak bir işlem gönderdiyse sonunda büyük bir uyarı verir.
+
+Cube mesajlarını görmek istemezsen senaryo adından önce `-q` ekle:
+`uav-sim run -q gps_yok -- ...`
+
+**İki pencereyle çalışmak istersen**, örneğin Cube'u uzun süre açık tutup kodunu tekrar
+tekrar çalıştırmak için:
+1. Birinci pencerede `uav-sim gps_yok` çalıştır.
+2. İkinci pencerede `uav-sim env gps_yok` yaz. Ekrana basılan `set ...` (cmd) ya da
+   `$env:...` (PowerShell) satırlarını o pencereye yapıştır.
+3. Kodunu ikinci pencerede istediğin kadar çalıştır.
 
 Kodunda bağlantıyı şöyle açarsan hem gerçek seri portta hem burada çalışır. Adres
 config'den gelir, gerçek Pi'de `/dev/ttyAMA0`, simülasyonda `udpin:0.0.0.0:14560`:
@@ -66,26 +82,20 @@ config'den gelir, gerçek Pi'de `/dev/ttyAMA0`, simülasyonda `udpin:0.0.0.0:145
 mavutil.mavlink_connection(port, baud=baud, source_system=1, source_component=191)
 ```
 
-**3. İstersen Mission Planner'ı da bağla.** Sağ üstte bağlantı türünü **UDP** seç, Connect'e
-bas, port olarak **14550** yaz. Heartbeat gelir, uçak haritada Ankara'da görünür. Ctrl+F ile
-açılan menüde **MAVLink Inspector** ile mesajları canlı izleyebilirsin. Bu ekran 1. haftanın
-ekran görüntüsü görevi için de işine yarar.
+**Mission Planner'ı da bağlayabilirsin.** Sahte Cube çalışırken sağ üstte bağlantı türünü
+**UDP** seç, Connect'e bas, port olarak **14550** yaz. Uçak haritada Ankara'da görünür.
+Ctrl+F ile açılan menüde **MAVLink Inspector** ile mesajları canlı izleyebilirsin. Bu ekran
+1. haftanın ekran görüntüsü görevi için de işine yarar.
 
-> Mission Planner bağlıyken parametre indirme eksik kalabilir, çünkü sahte Cube sadece servo
+> Mission Planner'da parametre indirme eksik kalabilir, çünkü sahte Cube sadece servo
 > parametrelerini biliyor. Bu normal.
-
-PowerShell kullanmak istersen ortam değişkenlerini elle ayarla:
-```
-$env:UAV_SIM_SCENARIO = "C:\Users\Yusuf\uav-sim\scenarios\gps_yok.toml"
-$env:PYTHONPATH = "C:\Users\Yusuf\uav-sim\sim_libs;C:\Users\Yusuf\uav-sim"
-python -m uav_sim          # ayrı bir pencerede (aynı değişkenlerle)
-```
 
 ## Kamera
 
-Kodunda normal şekilde `from picamera2 import Picamera2` yaz. `PYTHONPATH` ayarlıyken
-Python sahte kamerayı bulur. Gerçek Pi'de `PYTHONPATH`'i ayarlamazsın, gerçek kütüphane
-çalışır. Sahte kamera şunları destekler:
+Kodunda normal şekilde `from picamera2 import Picamera2` yaz. `uav-sim run` (ya da
+`uav-sim env`) `PYTHONPATH`'i ayarladığı için Python sahte kamerayı bulur. Gerçek Pi'de
+bunu yapmazsın, gerçek kütüphane çalışır. Sahte kamera sadece `uav-sim` üzerinden
+çalıştırınca devreye girer, normal Python ortamını bozmaz. Sahte kamera şunları destekler:
 
 - `Picamera2()`, `Picamera2.global_camera_info()`
 - `create_video_configuration(main={"size": (1920, 1080)})` ve preview/still sürümleri
@@ -100,14 +110,16 @@ Gerçeğe benzeyen birkaç davranışı da var:
 
 ## Pi sistemi (sıcaklık, throttling)
 
-Sahte Cube çalışırken her saniye `sim_pi/thermal_zone0/temp` (mili-derece, örneğin `52000`)
-ve `sim_pi/throttled` dosyalarını yazar. Kodunda bu yolları kodun içine gömme, config'den
+Sahte Cube çalışırken her saniye `<kullanıcı klasörü>/.uav-sim/pi/thermal_zone0/temp`
+(mili-derece, örneğin `52000`) ve `.../pi/throttled` dosyalarını yazar. Tam yolları
+`uav-sim paths` gösterir. `vcgencmd` yerine `uav-sim vcgencmd get_throttled` kullanılır. Kodunda bu yolları kodun içine gömme, config'den
 oku (proje kuralı zaten bu). Simülasyon için ayrı bir config dosyası kullan. Örneği
 [`config_sim.ornek.toml`](config_sim.ornek.toml) dosyasında bulabilirsin.
 
 ## Senaryolar
 
-Hepsi `scenarios/` klasöründe. Her dosyanın başında ne beklendiği yazıyor.
+`uav-sim list` hepsini gösterir. Dosyalar [`uav_sim/scenarios/`](uav_sim/scenarios)
+klasöründe, her dosyanın başında ne beklendiği yazıyor.
 
 | Senaryo | Ne oluyor? | Beklenen sonuç |
 |---|---|---|
@@ -134,7 +146,7 @@ Hepsi `scenarios/` klasöründe. Her dosyanın başında ne beklendiği yazıyor
 | `paket_kaybi` | Paketlerin %30'u kayboluyor | Kod sağlam kalmalı |
 
 **Kendi senaryonu yaz.** Yeni bir `.toml` dosyası oluştur ve sadece değiştirmek istediğin
-değerleri yaz. Yazmadığın her şey [`uav_sim/scenario.py`](uav_sim/scenario.py) içindeki
+değerleri yaz. Sonra ad yerine dosya yolunu ver: `uav-sim run benim.toml -- ...` Yazmadığın her şey [`uav_sim/scenario.py`](uav_sim/scenario.py) içindeki
 `DEFAULTS` sözlüğünden gelir. Tüm ayarlar orada açıklamalı olarak duruyor (kanal
 parametreleri, mesaj hızları, sysid ve diğerleri).
 

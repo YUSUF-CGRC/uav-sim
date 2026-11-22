@@ -19,8 +19,13 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-# Ortam değişkeni: sahte kamera ve diğer parçalar senaryoyu buradan bulur.
+# Ortam değişkenleri: sahte kamera ve diğer parçalar ayarları buradan bulur.
 SCENARIO_ENV = "UAV_SIM_SCENARIO"
+PI_DIR_ENV = "UAV_SIM_PI_DIR"
+
+PACKAGE_DIR = Path(__file__).resolve().parent
+SCENARIO_DIR = PACKAGE_DIR / "scenarios"
+SIM_LIBS_DIR = PACKAGE_DIR / "sim_libs"     # sahte picamera2 burada
 
 DEFAULTS: dict[str, Any] = {
     "link": {
@@ -104,9 +109,44 @@ DEFAULTS: dict[str, Any] = {
         "cpu_temp_c": 52.0,
         "temp_rise_c_per_min": 0.0,
         "throttled": "0x0",         # vcgencmd get_throttled çıktısı (0x50005 = düşük voltaj)
-        "folder": "sim_pi",         # sahte sıcaklık dosyasının yazılacağı klasör
+        # Sahte sıcaklık/throttling dosyalarının klasörü. Boş = varsayılan
+        # (UAV_SIM_PI_DIR ortam değişkeni ya da kullanıcı klasöründe .uav-sim/pi)
+        "folder": "",
     },
 }
+
+
+def pi_dir() -> Path:
+    """Sahte Pi dosyalarının (sıcaklık, throttling) bulunduğu klasör."""
+    env = os.environ.get(PI_DIR_ENV)
+    return Path(env) if env else Path.home() / ".uav-sim" / "pi"
+
+
+def resolve_scenario(name: str | None) -> Path | None:
+    """Senaryo adını (ör. "gps_yok") ya da dosya yolunu gerçek dosya yoluna çevirir."""
+    if not name:
+        return None
+    path = Path(name)
+    if path.suffix == ".toml" and path.exists():
+        return path.resolve()
+    builtin = SCENARIO_DIR / f"{path.stem}.toml"
+    if builtin.exists():
+        return builtin
+    raise FileNotFoundError(
+        f"Senaryo bulunamadı: {name}. Hazır senaryoları görmek için: uav-sim list")
+
+
+def list_scenarios() -> list[tuple[str, str]]:
+    """Hazır senaryoların (ad, ilk açıklama satırı) listesi."""
+    result = []
+    for path in sorted(SCENARIO_DIR.glob("*.toml")):
+        first = ""
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.startswith("#"):
+                first = line.lstrip("# ").strip()
+                break
+        result.append((path.stem, first))
+    return result
 
 
 def _merge(base: dict[str, Any], extra: dict[str, Any]) -> dict[str, Any]:
@@ -130,6 +170,6 @@ def load_scenario(path: str | os.PathLike[str] | None = None) -> dict[str, Any]:
         path = os.environ.get(SCENARIO_ENV)
     if not path:
         return copy.deepcopy(DEFAULTS)
-    with open(Path(path), "rb") as f:
+    with open(resolve_scenario(str(path)) or path, "rb") as f:
         data = tomllib.load(f)
     return _merge(DEFAULTS, data)

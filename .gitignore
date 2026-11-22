@@ -1,4 +1,5 @@
 __pycache__/
 *.pyc
-sim_pi/throttled
-sim_pi/thermal_zone0/
+*.egg-info/
+build/
+dist/

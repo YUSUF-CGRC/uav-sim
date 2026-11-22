@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uav-sim"
+version = "0.2.0"
+description = "Preflight kodunu donanımsız denemek için sahte Cube Orange+ (ArduPlane), sahte Pi Camera ve sahte Pi"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["pymavlink>=2.4.41", "numpy"]
+
+[project.scripts]
+uav-sim = "uav_sim.__main__:main"
+
+[tool.setuptools]
+packages = ["uav_sim"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+uav_sim = ["scenarios/*.toml", "sim_libs/picamera2/*.py"]
+
+[tool.flake8]
+max-line-length = 100
